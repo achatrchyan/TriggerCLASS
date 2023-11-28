@@ -1451,6 +1451,7 @@ int input_read_parameters(
   class_read_double("z_decay_NEDE", pba->z_decay);
   class_read_double("NEDE_trigger_mass", pba->NEDE_trigger_mass);
   class_read_double("three_eos_NEDE", pba->three_eos_NEDE);
+  class_read_double("dwdlna", pba->dwdlna); //chatrchyan
   class_read_double("three_ceff2_NEDE", ppt->three_ceff2_NEDE);
   class_read_double("three_cvis2_NEDE", ppt->three_cvis2_NEDE);
   class_read_double("H_over_m_NEDE", pba->Bubble_trigger_H_over_m);
@@ -1534,8 +1535,11 @@ int input_read_parameters(
                "Trigger mass is negative. This is probably the result of a bad shooting guess. Try to improve the shooting routine.");
 
     if (pba->NEDE_fld_nature == NEDE_fld_A)
-      pba->Omega0_NEDE = pba->Omega_NEDE * pow(1. / (1. + pba->z_decay), (3. + pba->three_eos_NEDE));
-
+    {
+        pba->Omega0_NEDE = pba->Omega_NEDE * pow(1. / (1. + pba->z_decay), (3. + pba->three_eos_NEDE))*exp(-1.5*(pba->dwdlna)*log(1. + (pba->z_decay))*log(1. + (pba->z_decay))); //chatrchyan, needs to be changed
+        class_test(pba->Omega0_NEDE > 0.01, errmsg,
+               "The NEDE abundance today is too large. Increase the dwdlna parameter."); //chatrchyan
+    }
     Omega_tot += pba->Omega0_NEDE;
     Omega_tot += pba->Omega0_trigger;
 
@@ -3712,6 +3716,7 @@ int input_default_params(
   /* - New EDE parameters */
   pba->Omega_trigger_decay = 0.;
   pba->three_eos_NEDE = 2.; // Default: w=2/3.
+  pba->dwdlna = 0.; //chatrchyan, Default 0
   pba->Omega_NEDE = 0.;
   pba->f_NEDE = 0;
   pba->Omega0_NEDE = 0.;

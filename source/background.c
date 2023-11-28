@@ -518,7 +518,8 @@ int background_functions(
       rho_NEDE_decay = pba->Omega_NEDE * pow(pba->H0, 2);
       /* Save value of rho in array for later use.*/
       pvecback[pba->index_bg_rho_NEDE] = rho_NEDE_decay;
-      pvecback[pba->index_bg_w_NEDE] = -1;
+      pvecback[pba->index_bg_w_NEDE] = -1; //chatrchyan
+      pvecback[pba->index_bg_dwdlna_NEDE] = 0;
 
       p_tot -= rho_NEDE_decay;   /*add pressure contribution*/
       rho_tot += rho_NEDE_decay; /*add energy contribution*/
@@ -534,10 +535,11 @@ int background_functions(
       pvecback[pba->index_bg_rho_NEDE] = rho_NEDE_decay;
 
       pvecback[pba->index_bg_w_NEDE] = w_NEDE;
+      pvecback[pba->index_bg_dwdlna_NEDE] = dw_over_da_NEDE*a_rel;//chatrchyan, come back to this!!! dw_over_da_NEDE
       p_tot += w_NEDE * rho_NEDE_decay;
       rho_tot += rho_NEDE_decay;
 
-      dp_dloga += (a * dw_over_da_NEDE - 3 * (1 + w_NEDE) * w_NEDE) * pvecback[pba->index_bg_rho_NEDE];
+      dp_dloga += (a * dw_over_da_NEDE - 3 * (1 + w_NEDE) * w_NEDE) * pvecback[pba->index_bg_rho_NEDE]; //chatrchyan, is this correct?
     }
   }
 
@@ -789,13 +791,13 @@ int background_quantities_NEDE(
   {
   case NEDE_fld_A:
     w_local = pba->three_eos_NEDE / 3.;
-    rho_local = (pba->Omega_NEDE) * pow(pba->H0, 2) * pow(pba->a_decay / a, 3. + 3. * w_local);
-    w_prime = 0.;
+    rho_local = (pba->Omega_NEDE) * pow(pba->H0, 2) * pow(pba->a_decay / a, 3. + 3. * w_local) * exp(-1.5*(pba->dwdlna)*log(a/(pba->a_decay))*log(a/(pba->a_decay))); //must be changed, chatrchyan!!!
+    w_prime = pba->dwdlna * a_prime_over_a; //must be changed, chatrchyan, w_prime is the derivative wrt to conformal time.
 
     if (w != NULL)
       *w = w_local;
     if (dw_over_da != NULL)
-      *dw_over_da = 0;
+      *dw_over_da = pba->dwdlna/a; // must be changed, chatrchyan!
     if (rho != NULL)
       *rho = rho_local;
     if (p != NULL)
@@ -1265,6 +1267,8 @@ int background_indices(
   class_define_index(pba->index_bg_rho_NEDE, pba->has_NEDE, index_bg, 1);
   /* - index for NEDE eos   */
   class_define_index(pba->index_bg_w_NEDE, pba->has_NEDE, index_bg, 1);
+  //chatrchyan
+  class_define_index(pba->index_bg_dwdlna_NEDE, pba->has_NEDE, index_bg, 1);
   /* - index for trigger   */
   class_define_index(pba->index_bg_phi_trigger, pba->has_NEDE_trigger, index_bg, 1);
   class_define_index(pba->index_bg_phi_prime_trigger, pba->has_NEDE_trigger, index_bg, 1);
@@ -1994,7 +1998,7 @@ int background_solve(
   double a;
 
   double d;
-  double w_NEDE, ca2_NEDE;
+  double w_NEDE, ca2_NEDE, dw_over_da_NEDE; //chatrchyan! I changed here
   double H_start_averaging;
   double phi_fluid, phi_prime_fluid, phi_c, phi_s, phi_c_p, phi_s_p, rho_tfa, factor;
 
@@ -2417,7 +2421,10 @@ int background_solve(
       printf("     -> NEDE decay time: %.2f \n", pba->z_decay);
       printf("     -> NEDE fraction: %.4f \n", pba->f_NEDE);
       if (pba->NEDE_fld_nature == NEDE_fld_A)
+      {
         printf("     -> Scenario A with eos NEDE: 3*w = %.2f \n", pba->three_eos_NEDE);
+        printf("     -> Scenario A with derivative of eos NEDE: dwdlna = %.2f \n", pba->dwdlna);
+      }
       printf("     -> Percolation trigger (H/m): %f \n", pba->Bubble_trigger_H_over_m);
       printf("     -> closure check: H/H0-1: %e \n", pvecback[pba->index_bg_H] / pba->H0 - 1);
 
@@ -2834,6 +2841,7 @@ int background_output_titles(struct background *pba,
   /* titles for printing in file */
   class_store_columntitle(titles, "(.)rho_NEDE", pba->has_NEDE);
   class_store_columntitle(titles, "(.)w_NEDE", pba->has_NEDE);
+  class_store_columntitle(titles, "(.)dwdlna_NEDE", pba->has_NEDE);
   class_store_columntitle(titles, "(.)rho_trigger", pba->has_NEDE_trigger);
   class_store_columntitle(titles, "(.)p_trigger", pba->has_NEDE_trigger);
   class_store_columntitle(titles, "(.)p_prime_trigger", pba->has_NEDE_trigger);
@@ -2907,6 +2915,7 @@ int background_output_data(
     /*decide which values are printed in file*/
     class_store_double(dataptr, pvecback[pba->index_bg_rho_NEDE], pba->has_NEDE, storeidx);
     class_store_double(dataptr, pvecback[pba->index_bg_w_NEDE], pba->has_NEDE, storeidx);
+    class_store_double(dataptr, pvecback[pba->index_bg_dwdlna_NEDE], pba->has_NEDE, storeidx);
     class_store_double(dataptr, pvecback[pba->index_bg_rho_trigger], pba->has_NEDE_trigger, storeidx);
     class_store_double(dataptr, pvecback[pba->index_bg_p_trigger], pba->has_NEDE_trigger, storeidx);
     class_store_double(dataptr, pvecback[pba->index_bg_p_prime_trigger], pba->has_NEDE_trigger, storeidx);

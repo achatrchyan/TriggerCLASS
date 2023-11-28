@@ -112,6 +112,9 @@ struct background
     /*NEDE e.o.s. (scenario A)*/
     double three_eos_NEDE;
 
+    /* chatrchyan */
+    double dwdlna;
+
     /* New EDE decay flag */
     short decay_flag;
 
@@ -275,6 +278,7 @@ struct background
 
     int index_bg_rho_NEDE; /**< New EDE density */
     int index_bg_w_NEDE;   /**< NEDE eos parameter */
+    int index_bg_dwdlna_NEDE; /* chatrchyan */
     int index_bg_w_trigger_fld; 
 
     int index_bg_phi_scf;       /**< scalar field value */
