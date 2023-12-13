@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "diff_bg": "c",
-        "diff_in_c": "c"
+        "diff_in_c": "c",
+        "cmath": "c"
     }
 }

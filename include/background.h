@@ -114,6 +114,7 @@ struct background
 
     /* chatrchyan */
     double dwdlna;
+    double d2wdlna2;
 
     /* New EDE decay flag */
     short decay_flag;
@@ -279,6 +280,7 @@ struct background
     int index_bg_rho_NEDE; /**< New EDE density */
     int index_bg_w_NEDE;   /**< NEDE eos parameter */
     int index_bg_dwdlna_NEDE; /* chatrchyan */
+  //  int index_bg_d2wdlna2_NEDE; /* chatrchyan */
     int index_bg_w_trigger_fld; 
 
     int index_bg_phi_scf;       /**< scalar field value */
