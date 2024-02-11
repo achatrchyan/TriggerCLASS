@@ -815,6 +815,10 @@ class Data(object):
             elif elem == 'log10z':
                 self.cosmo_arguments['z_decay_NEDE'] = 10**self.cosmo_arguments[elem]
                 del self.cosmo_arguments[elem]
+                                      
+            elif elem == 'y_dwdlna':
+                self.cosmo_arguments['dwdlna'] = self.cosmo_arguments[elem] + (-0.5 - self.cosmo_arguments['three_eos_NEDE']/3. - 0.5*self.cosmo_arguments['d2wdlna2']*math.log(self.cosmo_arguments['z_decay_NEDE'])*math.log(self.cosmo_arguments['z_decay_NEDE'])) / (math.log(self.cosmo_arguments['z_decay_NEDE']))
+                del self.cosmo_arguments[elem]
 
             elif elem == 'ln10^{10}A_s':
                 self.cosmo_arguments['A_s'] = math.exp(

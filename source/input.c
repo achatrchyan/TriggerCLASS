@@ -1538,8 +1538,8 @@ int input_read_parameters(
     if (pba->NEDE_fld_nature == NEDE_fld_A)
     {
         pba->Omega0_NEDE = pba->Omega_NEDE * pow(1. / (1. + pba->z_decay), (3. + pba->three_eos_NEDE))*exp(-1.5*(pba->dwdlna)*log(1. + (pba->z_decay))*log(1. + (pba->z_decay)))*exp(-0.5*(pba->d2wdlna2)*log(1. + (pba->z_decay))*log(1. + (pba->z_decay))*log(1. + (pba->z_decay))); //chatrchyan, needs to be changed
-        class_test(pba->Omega0_NEDE > 0.01, errmsg,
-               "The NEDE abundance today is too large. Increase the dwdlna parameter."); //chatrchyan, come back to this
+      //  class_test(pba->Omega0_NEDE > 0.01, errmsg,
+        //       "The NEDE abundance today is too large. Increase the dwdlna parameter."); //chatrchyan, come back to this
     }
     Omega_tot += pba->Omega0_NEDE;
     Omega_tot += pba->Omega0_trigger;

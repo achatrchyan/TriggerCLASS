@@ -792,12 +792,12 @@ int background_quantities_NEDE(
   switch (pba->NEDE_fld_nature)
   {
   case NEDE_fld_A:
-  //  w_local = pba->three_eos_NEDE / 3.;
-     w_local = pba->three_eos_NEDE / 3. + pba->dwdlna*log(a/(pba->a_decay)) + 0.5*(pba->d2wdlna2)*log(a/(pba->a_decay))*log(a/(pba->a_decay));
-  //  rho_local = (pba->Omega_NEDE) * pow(pba->H0, 2) * pow(pba->a_decay / a, 3. + 3. * w_local) * exp(-1.5*(pba->dwdlna)*log(a/(pba->a_decay))*log(a/(pba->a_decay))); //must be changed, chatrchyan!!!
-    rho_local = (pba->Omega_NEDE) * pow(pba->H0, 2) * pow(pba->a_decay / a, 3. + 3. * w_local) * exp(-1.5*(pba->dwdlna)*log(a/(pba->a_decay))*log(a/(pba->a_decay)))* exp(-0.5*(pba->d2wdlna2)*log(a/(pba->a_decay))*log(a/(pba->a_decay))*log(a/(pba->a_decay))); //must be changed, chatrchyan!!!
-  //  w_prime = pba->dwdlna * a_prime_over_a; //correct, chatrchyan, w_prime is the derivative wrt to conformal time.
+    w_local = pba->three_eos_NEDE / 3. + pba->dwdlna*log(a/(pba->a_decay)) + 0.5*(pba->d2wdlna2)*log(a/(pba->a_decay))*log(a/(pba->a_decay));
+    rho_local = (pba->Omega_NEDE) * pow(pba->H0, 2) * pow(pba->a_decay / a, 3. + pba->three_eos_NEDE) * exp(-1.5*(pba->dwdlna)*log(a/(pba->a_decay))*log(a/(pba->a_decay)))* exp(-0.5*(pba->d2wdlna2)*log(a/(pba->a_decay))*log(a/(pba->a_decay))*log(a/(pba->a_decay))); //must be changed, chatrchyan!!!
     w_prime = pba->dwdlna * a_prime_over_a + pba->d2wdlna2*log(a/(pba->a_decay))*a_prime_over_a; //correct, chatrchyan, w_prime is the derivative wrt to conformal time.
+
+
+
 
     if (w != NULL)
       *w = w_local;
